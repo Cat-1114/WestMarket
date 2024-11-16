@@ -1,0 +1,156 @@
+
+package westmarket;
+
+import java.util.ArrayList;
+import java.util.Scanner;
+
+public class WestMarket {
+    // Clase para Categorías
+    static class Categoria {
+        int codigo;
+        String nombre;
+
+        Categoria(int codigo, String nombre) {
+            this.codigo = codigo;
+            this.nombre = nombre;
+        }
+
+        @Override
+        public String toString() {
+            return "Código: " + codigo + " - Nombre: " + nombre;
+        }
+    }
+
+    // Clase para Productos
+    static class Producto {
+        int codigo;
+        String descripcion;
+        int precio;
+        int stock;
+        Categoria categoria;
+
+        Producto(int codigo, String descripcion, int precio, int stock, Categoria categoria) {
+            this.codigo = codigo;
+            this.descripcion = descripcion;
+            this.precio = precio;
+            this.stock = stock;
+            this.categoria = categoria;
+        }
+
+        @Override
+        public String toString() {
+            return "Código: " + codigo + " - Descripción: " + descripcion + 
+                   " - Precio: $" + precio + " - Stock: " + stock + 
+                   " - Categoría: " + categoria.nombre;
+        }
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        ArrayList<Categoria> categorias = inicializarCategorias();
+        ArrayList<Producto> productos = new ArrayList<>();
+        int opcion;
+
+        do {
+            System.out.println("\n--- West Market ---");
+            System.out.println("1. Registrar producto");
+            System.out.println("2. Imprimir productos");
+            System.out.println("3. Eliminar producto");
+            System.out.println("4. Salir");
+            System.out.print("Seleccione una opción: ");
+            opcion = scanner.nextInt();
+            scanner.nextLine(); // Consumir el salto de línea restante
+
+            switch (opcion) {
+                case 1 -> registrarProducto(scanner, productos, categorias);
+                case 2 -> imprimirProductos(productos);
+                case 3 -> eliminarProducto(scanner, productos);
+                case 4 -> System.out.println("Saliendo del sistema...");
+                default -> System.out.println("Opción no válida. Intente nuevamente.");
+            }
+        } while (opcion != 4);
+
+        scanner.close();
+    }
+
+    private static ArrayList<Categoria> inicializarCategorias() {
+        ArrayList<Categoria> categorias = new ArrayList<>();
+        categorias.add(new Categoria(1, "Bebidas"));
+        categorias.add(new Categoria(2, "Congelados"));
+        categorias.add(new Categoria(3, "Lácteos"));
+        categorias.add(new Categoria(4, "Aseo"));
+        return categorias;
+    }
+
+    private static void registrarProducto(Scanner scanner, ArrayList<Producto> productos, ArrayList<Categoria> categorias) {
+        System.out.print("Ingrese el código del producto: ");
+        int codigo = scanner.nextInt();
+        scanner.nextLine(); // Consumir el salto de línea
+
+        for (Producto producto : productos) {
+            if (producto.codigo == codigo) {
+                System.out.println("El código ya está registrado. Intente con otro.");
+                return;
+            }
+        }
+
+        System.out.print("Ingrese la descripción del producto: ");
+        String descripcion = scanner.nextLine();
+
+        System.out.print("Ingrese el precio del producto: ");
+        int precio = scanner.nextInt();
+
+        System.out.print("Ingrese el stock del producto: ");
+        int stock = scanner.nextInt();
+
+        System.out.println("Seleccione la categoría del producto:");
+        for (Categoria categoria : categorias) {
+            System.out.println(categoria);
+        }
+        System.out.print("Ingrese el código de la categoría: ");
+        int codigoCategoria = scanner.nextInt();
+        scanner.nextLine(); // Consumir el salto de línea
+
+        Categoria categoriaSeleccionada = categorias.stream()
+                .filter(c -> c.codigo == codigoCategoria)
+                .findFirst()
+                .orElse(null);
+
+        if (categoriaSeleccionada == null) {
+            System.out.println("Categoría no válida. Registro cancelado.");
+            return;
+        }
+
+        productos.add(new Producto(codigo, descripcion, precio, stock, categoriaSeleccionada));
+        System.out.println("Producto registrado exitosamente.");
+    }
+
+    private static void imprimirProductos(ArrayList<Producto> productos) {
+        if (productos.isEmpty()) {
+            System.out.println("No hay productos registrados.");
+            return;
+        }
+        System.out.println("\n--- Lista de Productos ---");
+        for (Producto producto : productos) {
+            System.out.println(producto);
+        }
+    }
+
+    private static void eliminarProducto(Scanner scanner, ArrayList<Producto> productos) {
+        System.out.print("Ingrese el código del producto a eliminar: ");
+        int codigo = scanner.nextInt();
+        scanner.nextLine(); // Consumir el salto de línea
+
+        Producto productoAEliminar = productos.stream()
+                .filter(p -> p.codigo == codigo)
+                .findFirst()
+                .orElse(null);
+
+        if (productoAEliminar != null) {
+            productos.remove(productoAEliminar);
+            System.out.println("Producto eliminado exitosamente.");
+        } else {
+            System.out.println("No se encontró un producto con ese código.");
+        }
+    }
+}
